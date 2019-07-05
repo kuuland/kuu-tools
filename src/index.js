@@ -51,8 +51,9 @@ async function request (url, opts) {
   delete opts.onError
 
   // 定义异常处理器
-  const errorHandler = async (json) => {
-    const msg = _.get(json, 'msg') || window.L('网络异常')
+  const errorHandler = json => {
+    console.error(json)
+    const msg = _.get(json, 'msg') || _.get(json, 'errmsg') || window.L('网络异常')
     if (onError !== null) {
       if (_.isFunction(onError)) {
         onError(msg)
@@ -70,21 +71,21 @@ async function request (url, opts) {
     if (opts.rawData) {
       data = json
     } else {
-      if (json.code === 555) {
-        if (url !== `${_.get(configs, 'prefix', '')}/logout`) {
-          window.g_app._store.dispatch({
-            type: 'user/logout'
-          })
+      if (json.code !== 0) {
+        errorHandler(json)
+        if (json.code === 555) {
+          if (url !== `${_.get(configs, 'prefix', '')}/logout`) {
+            window.g_app._store.dispatch({
+              type: 'user/logout'
+            })
+          }
         }
-      } else if (json.code !== 0) {
-        console.error(json)
-        await errorHandler(json)
       } else {
         data = _.get(json, 'data', json)
       }
     }
   } else {
-    await errorHandler()
+    errorHandler()
   }
   return data
 }
@@ -168,6 +169,9 @@ export function del (url, body, opts) {
  */
 export function withPrefix (url) {
   let prefix = _.get(configs, 'prefix', '')
+  if (url.startsWith(prefix)) {
+    return url
+  }
   if (prefix) {
     prefix = prefix.startsWith('/') ? prefix : `/${prefix}`
     prefix = prefix.endsWith('/') ? prefix.substring(0, prefix.length - 1) : prefix
@@ -370,6 +374,44 @@ export function L (key, defaultMessage, context) {
     return value
   }
   return template
+}
+
+/**
+ * 方法映射
+ */
+export const methods = {
+  get,
+  post,
+  put,
+  del,
+  delete: del
+}
+
+/**
+ * 解析特定格式的URL
+ * @param {*} url 格式如“GET /user”
+ */
+export function parseAutoUrl (url) {
+  const split = _.split(url, ' ')
+  if (split.length === 1) {
+    return {
+      method: 'get',
+      url: split[0]
+    }
+  } else {
+    return {
+      method: split[0].toLowerCase(),
+      url: split[1]
+    }
+  }
+}
+
+/**
+ * 支持：GET /user 格式调用
+ */
+export function autoFetch (url, body, opts) {
+  const config = parseAutoUrl(url)
+  return methods[config.method](config.url, body, opts)
 }
 
 export default request
