@@ -1,6 +1,7 @@
 # kuu-tools
 
 [![NPM version](https://img.shields.io/npm/v/kuu-tools.svg?style=flat)](https://npmjs.org/package/kuu-tools)
+[![Build Status](https://travis-ci.org/kuuland/kuu-tools.svg?branch=master)](https://travis-ci.org/kuuland/kuu-tools)
 [![NPM downloads](http://img.shields.io/npm/dm/kuu-tools.svg?style=flat)](https://npmjs.org/package/kuu-tools)
 [![Dependencies](https://david-dm.org/yinfxs/kuu-tools.svg)](https://david-dm.org/yinfxs/kuu-tools)
 
