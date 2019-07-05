@@ -1,6 +1,16 @@
 # kuu-tools
 
+[![NPM version](https://img.shields.io/npm/v/kuu-tools.svg?style=flat)](https://npmjs.org/package/kuu-tools)
+[![NPM downloads](http://img.shields.io/npm/dm/kuu-tools.svg?style=flat)](https://npmjs.org/package/kuu-tools)
+[![Dependencies](https://david-dm.org/yinfxs/kuu-tools.svg)](https://david-dm.org/yinfxs/kuu-tools)
+
 Kuu front-end tools
+
+## Install
+
+```sh
+npm i kuu-tools
+```
 
 ## Request utils
 
