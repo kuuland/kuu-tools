@@ -54,10 +54,8 @@ async function request (url, opts) {
   const errorHandler = json => {
     console.error(json)
     const msg = _.get(json, 'msg') || _.get(json, 'errmsg') || window.L('网络异常')
-    if (onError !== null) {
-      if (_.isFunction(onError)) {
-        onError(msg)
-      }
+    if (_.isFunction(onError)) {
+      onError(msg)
     } else {
       message.error(msg)
     }
@@ -67,22 +65,27 @@ async function request (url, opts) {
   const res = await fetch(url, opts)
   let data = null
   if (res.status >= 200 && res.status < 300) {
-    const json = await res.json()
-    if (opts.rawData) {
-      data = json
-    } else {
-      if (json.code !== 0) {
-        errorHandler(json)
-        if (json.code === 555) {
-          if (url !== `${_.get(configs, 'prefix', '')}/logout`) {
-            window.g_app._store.dispatch({
-              type: 'user/logout'
-            })
-          }
-        }
+    let json
+    try {
+      json = await res.json()
+      if (opts.rawData) {
+        data = json
       } else {
-        data = _.get(json, 'data', json)
+        if (json.code !== 0) {
+          errorHandler(json)
+          if (json.code === 555) {
+            if (url !== `${_.get(configs, 'prefix', '')}/logout`) {
+              window.g_app._store.dispatch({
+                type: 'user/logout'
+              })
+            }
+          }
+        } else {
+          data = _.get(json, 'data', json)
+        }
       }
+    } catch (e) {
+      console.error(res, e)
     }
   } else {
     errorHandler()
