@@ -53,11 +53,15 @@ async function request (url, opts) {
   // 定义异常处理器
   const errorHandler = json => {
     console.error(json)
-    const msg = _.get(json, 'msg') || _.get(json, 'errmsg') || window.L('网络异常')
-    if (_.isFunction(onError)) {
-      onError(msg)
+    if (!json) {
+      window.L('网络异常')
     } else {
-      message.error(msg)
+      const msg = _.get(json, 'msg') || _.get(json, 'errmsg')
+      if (_.isFunction(onError)) {
+        onError(msg)
+      } else if (msg) {
+        message.error(msg)
+      }
     }
   }
 
