@@ -1,6 +1,6 @@
 {
   "name": "kuu-tools",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Kuu front-end tools",
   "main": "lib/index.js",
   "scripts": {

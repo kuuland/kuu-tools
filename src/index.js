@@ -421,4 +421,23 @@ export function autoFetch (url, body, opts) {
   return methods[config.method](config.url, body, opts)
 }
 
+/**
+ * 解析图标字符串
+ * 支持：theme:type和type两种格式
+ * @param icon
+ */
+export function parseIcon (icon) {
+  const ret = {}
+  if (icon) {
+    const split = icon.split(':')
+    if (_.size(split) > 1) {
+      ret.theme = split[0]
+      ret.type = split[1]
+    } else {
+      ret.type = split[0]
+    }
+  }
+  return ret
+}
+
 export default request
