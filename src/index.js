@@ -81,7 +81,7 @@ async function request (url, opts) {
             }
           }
         } else {
-          data = _.get(json, 'data', json)
+          data = _.get(json, 'data')
         }
       }
     } catch (e) {
