@@ -183,7 +183,7 @@ export function withPrefix (url) {
     prefix = prefix.startsWith('/') ? prefix : `/${prefix}`
     prefix = prefix.endsWith('/') ? prefix.substring(0, prefix.length - 1) : prefix
   }
-  url = `${prefix}${url}`.toLowerCase()
+  url = `${prefix}${url}`
   return url
 }
 
