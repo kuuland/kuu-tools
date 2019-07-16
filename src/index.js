@@ -317,9 +317,9 @@ export async function one (name, query = {}) {
  * @param idVal
  * @returns {Promise<*|{}>}
  */
-export async function id (name, idVal) {
+export async function id (name, idVal, query = {}) {
   const idKey = _.get(configs, 'idKey', 'ID')
-  const json = await list(name, { cond: { [idKey]: idVal } })
+  const json = await list(name, _.merge({ cond: { [idKey]: idVal } }, query))
   return _.get(json, 'list[0]') || {}
 }
 
