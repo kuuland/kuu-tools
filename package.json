@@ -1,6 +1,6 @@
 {
   "name": "kuu-tools",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Kuu front-end tools",
   "main": "lib/index.js",
   "scripts": {
@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/kuuland/kuu-tools#readme",
   "dependencies": {
-    "antd": "^3.20.1",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.11",
     "qs": "^6.7.0"

@@ -1,5 +1,4 @@
 import fetch from 'isomorphic-fetch'
-import { message } from 'antd'
 import _ from 'lodash'
 import qs from 'qs'
 
@@ -52,15 +51,18 @@ async function request (url, opts) {
 
   // 定义异常处理器
   const errorHandler = json => {
-    console.error(json)
     if (!json) {
       window.L('网络异常')
     } else {
+      console.error(json)
       const msg = _.get(json, 'msg') || _.get(json, 'errmsg')
       if (_.isFunction(onError)) {
         onError(msg)
       } else if (msg) {
-        message.error(msg)
+        const handler = _.get(configs, 'messageHandlers.error')
+        if (_.isFunction(handler)) {
+          handler(msg)
+        }
       }
     }
   }
