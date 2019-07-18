@@ -64,3 +64,4 @@ typings/
 .vscode
 .history
 lib
+yarn.lock
