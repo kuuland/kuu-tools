@@ -439,6 +439,7 @@ export function parseIcon (icon) {
       ret.type = split[0]
     }
   }
+  ret.type = ret.type || 'fire'
   return ret
 }
 
