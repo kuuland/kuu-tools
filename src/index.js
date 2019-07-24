@@ -104,7 +104,9 @@ async function request (url, opts) {
  * @param {string} url
  * @param {object} options
  */
-export async function donwloadFile (url, options) {
+export async function downloadFile (url, options) {
+  // url加工
+  url = withPrefix(url)
   const res = await fetch(url, _.merge({
     cache: 'no-cache',
     credentials: 'include'
@@ -112,9 +114,16 @@ export async function donwloadFile (url, options) {
   const blob = await res.blob()
   const a = window.document.createElement('a')
   const href = window.URL.createObjectURL(blob)
-  const filename = new RegExp('filename="(.*)"').exec(res.headers.get('Content-Disposition'))[1]
+  let filename = res.headers.get('filename')
+  if (!filename) {
+    const contentDisposition = res.headers.get('Content-Disposition')
+    filename = _.get(new RegExp(/filename=(.*)/gi).exec(contentDisposition), '[1]')
+    if (!filename) {
+      filename = _.get(new RegExp(/filename="(.*)"/gi).exec(contentDisposition), '[1]')
+    }
+  }
   a.href = href
-  a.download = filename
+  a.download = filename || new Date().getTime()
   a.click()
   window.URL.revokeObjectURL(url)
 }
@@ -177,6 +186,9 @@ export function del (url, body, opts) {
  * @returns {string}
  */
 export function withPrefix (url) {
+  if (url.startsWith('http')) {
+    return url
+  }
   let prefix = _.get(configs, 'prefix', '')
   if (url.startsWith(prefix)) {
     return url
@@ -326,27 +338,6 @@ export async function id (name, idVal, query = {}) {
 }
 
 /**
- * 查询字典
- * @param codeOrObject 字典编码或字典对象
- * @returns {Promise<{}|*>}
- */
-export async function getDict (codeOrObject) {
-  const obj = _.isPlainObject(codeOrObject) ? codeOrObject : { Code: codeOrObject }
-  if (_.isEmpty(obj)) {
-    console.error(window.L(`查询条件不能为空`))
-    return {}
-  }
-  const json = await list('dict', {
-    cond: obj,
-    page: 1,
-    size: 1,
-    sort: '-UpdatedAt'
-  })
-  const dict = _.get(json, 'list[0]', {})
-  return dict
-}
-
-/**
  * 查询参数
  * @param codeOrObject 参数编码或参数对象
  * @returns {Promise<{}|*>}
@@ -374,7 +365,7 @@ export async function getParam (codeOrObject) {
  * @param {*} context 参数
  */
 export function L (key, defaultMessage, context) {
-  const language = _.result(window, 'g_app._store.getState.user.language') || _.result(window, 'i18nMessages', {})
+  const language = _.result(window, 'g_app._store.getState.user.language') || _.result(window, _.get(configs, 'localeMessagesKey', 'localeMessages'), {})
   const template = _.get(language, key, defaultMessage) || key
   if (context && !_.isEmpty(context)) {
     _.templateSettings.interpolate = /{{([\s\S]+?)}}/g
