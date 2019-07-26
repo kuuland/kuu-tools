@@ -1,6 +1,8 @@
+import React from 'react'
 import fetch from 'isomorphic-fetch'
 import _ from 'lodash'
 import qs from 'qs'
+import hoistStatics from 'hoist-non-react-statics'
 
 const configs = {
   prefix: '/api'
@@ -359,24 +361,6 @@ export async function getParam (codeOrObject) {
 }
 
 /**
- * 国际化函数
- * @param {*} key 字符串键
- * @param {*} defaultMessage 默认值
- * @param {*} context 参数
- */
-export function L (key, defaultMessage, context) {
-  const language = _.result(window, 'g_app._store.getState.user.language') || _.result(window, _.get(configs, 'localeMessagesKey', 'localeMessages'), {})
-  const template = _.get(language, key, defaultMessage) || key
-  if (context && !_.isEmpty(context)) {
-    _.templateSettings.interpolate = /{{([\s\S]+?)}}/g
-    const compiled = _.template(template)
-    const value = compiled(context)
-    return value
-  }
-  return template
-}
-
-/**
  * 方法映射
  */
 export const methods = {
@@ -432,6 +416,52 @@ export function parseIcon (icon) {
   }
   ret.type = ret.type || 'fire'
   return ret
+}
+
+/**
+ * defaultMessages
+ */
+const defaultMessages = _.result(window, 'g_app._store.getState.user.language') || _.result(window, _.get(config(), 'localeMessagesKey', 'localeMessages'), {})
+
+/**
+ * LocaleContext
+ * @type {React.Context<*>}
+ */
+export const LocaleContext = React.createContext(defaultMessages)
+
+/**
+ * withLocale
+ * @param Component
+ */
+export function withLocale (Component) {
+  const displayName = `withLocale(${Component.displayName || Component.name})`
+  const C = props => {
+    return (
+      <LocaleContext.Consumer>
+        {localeMessages => {
+          return (
+            <Component
+              {...props}
+              localeMessages={localeMessages}
+              L={(key, defaultMessage, formattedContext) => {
+                const template = _.get(localeMessages, key, defaultMessage) || key
+                if (formattedContext && !_.isEmpty(formattedContext)) {
+                  _.templateSettings.interpolate = /{{([\s\S]+?)}}/g
+                  const compiled = _.template(template)
+                  const value = compiled(formattedContext)
+                  return value
+                }
+                return template
+              }}
+            />
+          )
+        }}
+      </LocaleContext.Consumer>
+    )
+  }
+  C.displayName = displayName
+  C.WrappedComponent = Component
+  return hoistStatics(C, Component)
 }
 
 export default request
