@@ -123,6 +123,9 @@ export async function downloadFile (url, options) {
     if (!filename) {
       filename = _.get(new RegExp(/filename="(.*)"/gi).exec(contentDisposition), '[1]')
     }
+    if (filename) {
+      filename = window.decodeURIComponent(filename)
+    }
   }
   a.href = href
   a.download = filename || new Date().getTime()
@@ -435,33 +438,42 @@ export const LocaleContext = React.createContext(defaultMessages)
  */
 export function withLocale (Component) {
   const displayName = `withLocale(${Component.displayName || Component.name})`
-  const C = props => {
-    return (
-      <LocaleContext.Consumer>
-        {localeMessages => {
-          return (
-            <Component
-              {...props}
-              localeMessages={localeMessages}
-              L={(key, defaultMessage, formattedContext) => {
-                const template = _.get(localeMessages, key, defaultMessage) || key
-                if (formattedContext && !_.isEmpty(formattedContext)) {
-                  _.templateSettings.interpolate = /{{([\s\S]+?)}}/g
-                  const compiled = _.template(template)
-                  const value = compiled(formattedContext)
-                  return value
-                }
-                return template
-              }}
-            />
-          )
-        }}
-      </LocaleContext.Consumer>
-    )
+
+  class C extends React.Component {
+    render () {
+      const { forwardedRef, ...rest } = this.props
+      return (
+        <LocaleContext.Consumer>
+          {localeMessages => {
+            return (
+              <Component
+                {...rest}
+                ref={forwardedRef}
+                localeMessages={localeMessages}
+                L={(key, defaultMessage, formattedContext) => {
+                  const template = _.get(localeMessages, key, defaultMessage) || key
+                  if (formattedContext && !_.isEmpty(formattedContext)) {
+                    _.templateSettings.interpolate = /{{([\s\S]+?)}}/g
+                    const compiled = _.template(template)
+                    const value = compiled(formattedContext)
+                    return value
+                  }
+                  return template
+                }}
+              />
+            )
+          }}
+        </LocaleContext.Consumer>
+      )
+    }
   }
+
   C.displayName = displayName
   C.WrappedComponent = Component
-  return hoistStatics(C, Component)
+  const LocaleComponent = hoistStatics(C, Component)
+  return React.forwardRef((props, ref) => {
+    return <LocaleComponent {...props} forwardedRef={ref} />
+  })
 }
 
 export default request
