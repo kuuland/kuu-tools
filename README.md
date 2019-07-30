@@ -145,4 +145,4 @@ Notes:
 1. `withLocale(withRouter(Param))`
 1. `withLocale(connect(mapStateToProps)(withRouter(Param)))`
 
-> Notes: Message supports the [mustache](https://github.com/janl/mustache.js) syntax.
+> Message supports the [mustache](https://github.com/janl/mustache.js) syntax.
