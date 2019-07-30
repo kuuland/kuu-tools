@@ -104,31 +104,38 @@ async function request (url, opts) {
 /**
  * 文件下载
  * @param {string} url
+ * @param {string} filename
  * @param {object} options
  */
-export async function downloadFile (url, options) {
+export async function downloadFile (url, filename, options) {
   // url加工
   url = withPrefix(url)
   const res = await fetch(url, _.merge({
     cache: 'no-cache',
     credentials: 'include'
   }, options))
+  // 解析响应头filename
+  if (!filename) {
+    filename = res.headers.get('filename')
+  }
+  // 解析响应头content-disposition
+  const contentDisposition = res.headers.get('Content-Disposition')
+  if (!filename) {
+    filename = _.get(new RegExp(/filename=(.*)/gi).exec(contentDisposition), '[1]')
+  }
+  if (!filename) {
+    filename = _.get(new RegExp(/filename="(.*)"/gi).exec(contentDisposition), '[1]')
+  }
+  if (!filename) {
+    console.error('无法正常解析文件名')
+    return
+  }
+  filename = window.decodeURIComponent(filename)
+  // 生成下载链接
   const blob = await res.blob()
   const a = window.document.createElement('a')
-  const href = window.URL.createObjectURL(blob)
-  let filename = res.headers.get('filename')
-  if (!filename) {
-    const contentDisposition = res.headers.get('Content-Disposition')
-    filename = _.get(new RegExp(/filename=(.*)/gi).exec(contentDisposition), '[1]')
-    if (!filename) {
-      filename = _.get(new RegExp(/filename="(.*)"/gi).exec(contentDisposition), '[1]')
-    }
-    if (filename) {
-      filename = window.decodeURIComponent(filename)
-    }
-  }
-  a.href = href
-  a.download = filename || new Date().getTime()
+  a.href = window.URL.createObjectURL(blob)
+  a.download = filename
   a.click()
   window.URL.revokeObjectURL(url)
 }
