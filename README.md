@@ -114,19 +114,35 @@ const data = await id('param', 11)
 
 ## i18n
 
-```js
-import { L } from 'kuu-tools'
-
-window.i18nMessages = {
+```json
+{
      "hello": "你好",
      "welcome": "欢迎 {{name}}"
 }
-
-// Usage: L(id, defaultMessage, formattedContext)
-
-L('hello', 'Hello')                             // => 你好
-L('not_found', 'Not found')                     // => Not found
-L('welcome', 'Welcome Kuu', { name: 'Kuu' })    // => 欢迎 Kuu
 ```
+```js
+import { withLocale } from 'kuu-tools'
+
+class Param extends React.Component {
+  render () {
+    return (
+      <div>
+        <div>{this.props.L('hello', 'Hello')}</div>                         /* => 你好 */
+        <div>{this.props.L('not_found', 'Not found')}</div>                 /* => Not found */
+        <div>{this.props.L('welcome', 'Welcome Kuu', { name: 'Kuu' }}</div> /* => 欢迎 Kuu */
+      </div>
+    )
+  }
+}
+
+export default withLocale(Param)
+```
+
+Notes:
+ 
+1. `this.props.L` can only be used in `render`, otherwise it will not respond to language updates in real time.
+1. `withLocale(Param)`
+1. `withLocale(withRouter(Param))`
+1. `withLocale(connect(mapStateToProps)(withRouter(Param)))`
 
 > Notes: Message supports the [mustache](https://github.com/janl/mustache.js) syntax.
