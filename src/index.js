@@ -440,6 +440,25 @@ const defaultMessages = _.result(window, 'g_app._store.getState.user.language') 
 export const LocaleContext = React.createContext(defaultMessages)
 
 /**
+ * L
+ * @param key
+ * @param defaultMessage
+ * @param formattedContext
+ * @returns {*|L.props}
+ * @constructor
+ */
+export function L (key, defaultMessage, formattedContext) {
+  const template = _.get(configs.localeMessages, key, defaultMessage) || key
+  if (formattedContext && !_.isEmpty(formattedContext)) {
+    _.templateSettings.interpolate = /{{([\s\S]+?)}}/g
+    const compiled = _.template(template)
+    const value = compiled(formattedContext)
+    return value
+  }
+  return template
+}
+
+/**
  * withLocale
  * @param Component
  */
@@ -447,29 +466,28 @@ export function withLocale (Component) {
   const displayName = `withLocale(${Component.displayName || Component.name})`
 
   class C extends React.Component {
-    render () {
+    constructor (props) {
+      super(props)
+      this.consumerChildren = this.consumerChildren.bind(this)
+    }
+
+    consumerChildren (localeMessages) {
       const { forwardedRef, ...rest } = this.props
+      configs.localeMessages = localeMessages
+      return (
+        <Component
+          {...rest}
+          ref={forwardedRef}
+          localeMessages={localeMessages}
+          L={L}
+        />
+      )
+    }
+
+    render () {
       return (
         <LocaleContext.Consumer>
-          {localeMessages => {
-            return (
-              <Component
-                {...rest}
-                ref={forwardedRef}
-                localeMessages={localeMessages}
-                L={(key, defaultMessage, formattedContext) => {
-                  const template = _.get(localeMessages, key, defaultMessage) || key
-                  if (formattedContext && !_.isEmpty(formattedContext)) {
-                    _.templateSettings.interpolate = /{{([\s\S]+?)}}/g
-                    const compiled = _.template(template)
-                    const value = compiled(formattedContext)
-                    return value
-                  }
-                  return template
-                }}
-              />
-            )
-          }}
+          {this.consumerChildren}
         </LocaleContext.Consumer>
       )
     }
