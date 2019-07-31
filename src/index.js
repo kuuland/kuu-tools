@@ -108,8 +108,6 @@ async function request (url, opts) {
  * @param {object} options
  */
 export async function downloadFile (url, filename, options) {
-  // url加工
-  url = withPrefix(url)
   const res = await fetch(url, _.merge({
     cache: 'no-cache',
     credentials: 'include'
