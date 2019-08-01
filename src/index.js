@@ -54,7 +54,7 @@ async function request (url, opts) {
   // 定义异常处理器
   const errorHandler = json => {
     if (!json) {
-      window.L('网络异常')
+      console.error('Network error')
     } else {
       console.error(json)
       const msg = _.get(json, 'msg') || _.get(json, 'errmsg')
@@ -355,7 +355,7 @@ export async function id (name, idVal, query = {}) {
 export async function getParam (codeOrObject) {
   const obj = _.isPlainObject(codeOrObject) ? codeOrObject : { Code: codeOrObject }
   if (_.isEmpty(obj)) {
-    console.error(window.L(`查询条件不能为空`))
+    console.error(`查询条件不能为空`)
     return {}
   }
   const json = await list('param', {
