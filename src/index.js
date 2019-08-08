@@ -72,17 +72,19 @@ async function request (url, opts) {
   // 执行请求
   const res = await fetch(url, opts)
   let data = null
+  let success = false
   if (res.status >= 200 && res.status < 300) {
     let json
     try {
       json = await res.json()
       if (opts.rawData) {
         data = json
+        success = true
       } else {
         if (json.code !== 0) {
           errorHandler(json)
           if (json.code === 555) {
-            if (url !== `${_.get(configs, 'prefix', '')}/logout`) {
+            if (!url.includes('/logout')) {
               window.g_app._store.dispatch({
                 type: 'user/logout'
               })
@@ -90,6 +92,7 @@ async function request (url, opts) {
           }
         } else {
           data = _.get(json, 'data')
+          success = true
         }
       }
     } catch (e) {
@@ -98,7 +101,7 @@ async function request (url, opts) {
   } else {
     errorHandler()
   }
-  return data
+  return success && data
 }
 
 /**
