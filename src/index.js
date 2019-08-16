@@ -4,6 +4,36 @@ import _ from 'lodash'
 import qs from 'qs'
 import hoistStatics from 'hoist-non-react-statics'
 
+/**
+ * 组织表单字段
+ * @param L
+ * @returns
+ */
+export function orgField (L) {
+  return {
+    name: 'OrgID',
+    type: 'treeselect',
+    label: L('kuu_common_org', 'Organization'),
+    props: {
+      url: '/org?range=ALL&sort=Sort&project=ID,Code,Name,Pid',
+      titleKey: 'Name',
+      valueKey: 'ID'
+    }
+  }
+}
+
+/**
+ * 组织表单列
+ * @param L
+ * @returns
+ */
+export function orgColumn (L) {
+  return {
+    dataIndex: 'Org.Name',
+    title: L('kuu_common_org', 'Organization')
+  }
+}
+
 const configs = {
   prefix: '/api'
 }
