@@ -233,7 +233,7 @@ export function withPrefix (url) {
     return url
   }
   let prefix = _.get(configs, 'prefix', '')
-  if (url.startsWith(prefix)) {
+  if (url.startsWith(`${prefix}/`)) {
     return url
   }
   if (prefix) {
