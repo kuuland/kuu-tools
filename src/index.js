@@ -59,14 +59,16 @@ async function request (url, opts) {
   // url加工
   url = withPrefix(url)
   // 配置加工
-  opts = _.merge({
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    cache: 'no-cache',
-    credentials: 'include'
-  }, opts)
+  if (!opts) {
+    opts = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-cache',
+      credentials: 'include'
+    }
+  }
   if (_.isFunction(_.get(configs, 'beforeFetch'))) {
     const args = { url, opts }
     const ret = _.get(configs, 'beforeFetch')(args)
@@ -191,7 +193,12 @@ export function get (url, opts) {
 export function post (url, body, opts) {
   return request(url, _.merge({
     method: 'POST',
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    cache: 'no-cache',
+    credentials: 'include'
   }, opts))
 }
 
@@ -205,7 +212,12 @@ export function post (url, body, opts) {
 export function put (url, body, opts) {
   return request(url, _.merge({
     method: 'PUT',
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    cache: 'no-cache',
+    credentials: 'include'
   }, opts))
 }
 
@@ -219,7 +231,12 @@ export function put (url, body, opts) {
 export function del (url, body, opts) {
   return request(url, _.merge({
     method: 'DELETE',
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    cache: 'no-cache',
+    credentials: 'include'
   }, opts))
 }
 
