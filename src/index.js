@@ -41,11 +41,26 @@ const configs = {
 /**
  * 配置函数
  * @param [opts] 配置项（可选）
- * @returns 合并后的配置项
+ * @returns {prefix: string}
  */
 export function config (opts) {
   _.merge(configs, opts)
   return configs
+}
+
+/**
+ * 设置令牌
+ * @param token 令牌
+ */
+export function setToken (token) {
+  config({ token })
+}
+
+/**
+ * 获取令牌
+ */
+export function getToken () {
+  return _.get(configs, 'token')
 }
 
 /**
@@ -68,6 +83,11 @@ async function request (url, opts) {
       cache: 'no-cache',
       credentials: 'include'
     }
+  }
+  // 设置配置令牌
+  const configToken = getToken()
+  if (!_.isEmpty(configToken) && _.isEmpty(_.get(opts, 'headers.Token'))) {
+    _.set(opts, 'headers.Token', configToken)
   }
   if (_.isFunction(_.get(configs, 'beforeFetch'))) {
     const args = { url, opts }
