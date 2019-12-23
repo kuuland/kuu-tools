@@ -49,18 +49,18 @@ export function config (opts) {
 }
 
 /**
- * 设置令牌本地缓存键
- * @param tokenKey 令牌
+ * 设置令牌
+ * @param token 令牌
  */
-export function setTokenKey (tokenKey) {
-  config({ tokenKey })
+export function setToken (token) {
+  config({ token })
 }
 
 /**
- * 获取令牌本地缓存键
+ * 获取令牌
  */
-export function getTokenKey () {
-  return _.get(configs, 'tokenKey')
+export function getToken () {
+  return _.get(configs, 'token')
 }
 
 /**
@@ -85,12 +85,9 @@ async function request (url, opts) {
     }
   }
   // 设置配置令牌
-  const localTokenKey = getTokenKey()
-  if (!_.isEmpty(localTokenKey) && _.isEmpty(_.get(opts, 'headers.Token'))) {
-    const token = window.localStorage.getItem(localTokenKey)
-    if (!_.isEmpty(token)) {
-      _.set(opts, 'headers.Token', token)
-    }
+  const configToken = getToken()
+  if (!_.isEmpty(configToken) && _.isEmpty(_.get(opts, 'headers.Token'))) {
+    _.set(opts, 'headers.Token', configToken)
   }
   if (_.isFunction(_.get(configs, 'beforeFetch'))) {
     const args = { url, opts }
