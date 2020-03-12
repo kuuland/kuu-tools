@@ -4,69 +4,23 @@ import _ from 'lodash'
 import qs from 'qs'
 import hoistStatics from 'hoist-non-react-statics'
 
-/**
- * 组织表单字段
- * @param L
- * @returns
- */
-export function orgField (L) {
-  return {
-    name: 'OrgID',
-    type: 'treeselect',
-    label: L('kuu_common_org', 'Organization'),
-    props: {
-      url: '/org?range=ALL&sort=Sort&project=ID,Code,Name,Pid',
-      titleKey: 'Name',
-      valueKey: 'ID'
-    }
-  }
-}
-
-/**
- * 组织表单列
- * @param L
- * @returns
- */
-export function orgColumn (L) {
-  return {
-    dataIndex: 'Org.Name',
-    title: L('kuu_common_org', 'Organization')
-  }
-}
-
 const configs = {
-  prefix: '/api'
+  prefix: '/api',
+  tokenKey: 'token',
+  tokenValue: undefined,
+  idKey: 'ID',
+  messageHandler: undefined,
+  localeContext: undefined,
+  localeMessages: undefined
 }
 
-/**
- * 配置函数
- * @param [opts] 配置项（可选）
- * @returns {prefix: string}
- */
-export function config (opts) {
-  _.merge(configs, opts)
-  return configs
-}
-
-/**
- * 设置令牌
- * @param token 令牌
- */
-export function setToken (token) {
-  config({ token })
-}
-
-/**
- * 获取令牌
- */
-export function getToken () {
-  return _.get(configs, 'token')
+export function getLocaleContext () {
+  return configs.localeContext
 }
 
 /**
  * 底层请求封装
  * @param url
- * @param body
  * @param [opts]
  * @return {Promise}
  */
@@ -85,9 +39,11 @@ async function request (url, opts) {
     }
   }
   // 设置配置令牌
-  const configToken = getToken()
-  if (!_.isEmpty(configToken) && _.isEmpty(_.get(opts, 'headers.Token'))) {
-    _.set(opts, 'headers.Token', configToken)
+  const token = getToken()
+  if (token) {
+    _.set(opts, 'headers.Authorization', token)
+    _.set(opts, 'headers.api_key', token)
+    _.set(opts, 'headers.Token', token)
   }
   if (_.isFunction(_.get(configs, 'beforeFetch'))) {
     const args = { url, opts }
@@ -98,26 +54,6 @@ async function request (url, opts) {
     } else {
       url = args.url
       opts = args.opts
-    }
-  }
-  const onError = _.result(opts, 'onError', null)
-  delete opts.onError
-
-  // 定义异常处理器
-  const errorHandler = json => {
-    if (!json) {
-      console.error('Network error')
-    } else {
-      console.error(json)
-      const msg = _.get(json, 'msg') || _.get(json, 'errmsg')
-      if (_.isFunction(onError)) {
-        onError(msg)
-      } else if (msg) {
-        const handler = _.get(configs, 'messageHandlers.error')
-        if (_.isFunction(handler)) {
-          handler(msg)
-        }
-      }
     }
   }
 
@@ -134,13 +70,14 @@ async function request (url, opts) {
         success = true
       } else {
         if (json.code !== 0) {
-          errorHandler(json)
           if (json.code === 555) {
             if (!url.includes('/logout')) {
               window.g_app._store.dispatch({
                 type: 'user/logout'
               })
             }
+          } else {
+            handleResponseMessage(json)
           }
         } else {
           data = _.get(json, 'data')
@@ -151,9 +88,26 @@ async function request (url, opts) {
       console.error(res, e)
     }
   } else {
-    errorHandler()
+    handleResponseMessage()
   }
   return success && data
+}
+
+// 定义异常处理器
+function handleResponseMessage (json) {
+  if (!json) {
+    console.error('Network error')
+  } else {
+    console.error(json)
+    const code = _.get(json, 'code') || _.get(json, 'errcode')
+    const msg = _.get(json, 'msg') || _.get(json, 'errmsg')
+    if (msg) {
+      const handler = _.get(configs, 'messageHandler')
+      if (_.isFunction(handler)) {
+        handler(msg, code, json)
+      }
+    }
+  }
 }
 
 /**
@@ -191,6 +145,73 @@ export async function downloadFile (url, filename, options) {
   a.download = filename
   a.click()
   window.URL.revokeObjectURL(url)
+}
+
+/**
+ * 组织表单字段
+ * @param L
+ * @returns
+ */
+export function orgField (L) {
+  return {
+    name: 'OrgID',
+    type: 'treeselect',
+    label: L('kuu_common_org', 'Organization'),
+    props: {
+      url: '/org?range=ALL&sort=Sort&project=ID,Code,Name,Pid',
+      titleKey: 'Name',
+      valueKey: 'ID'
+    }
+  }
+}
+
+/**
+ * 组织表单列
+ * @param L
+ * @returns
+ */
+export function orgColumn (L) {
+  return {
+    dataIndex: 'Org.Name',
+    title: L('kuu_common_org', 'Organization')
+  }
+}
+
+/**
+ * 配置函数
+ * @param [opts] 配置项（可选）
+ * @returns
+ */
+export function config (opts) {
+  _.merge(configs, opts)
+  return configs
+}
+
+/**
+ * 设置令牌
+ * @param token 令牌
+ */
+export function setToken (token) {
+  configs.tokenValue = token
+  window.localStorage.setItem(configs.tokenKey, token)
+}
+
+/**
+ * 获取令牌
+ */
+export function getToken () {
+  // 优先取url中的令牌
+  const query = qs.parse(window.location.search.substr(1))
+  let token = query[configs.tokenKey]
+  // url中没有再从缓存取
+  if (!token) {
+    token = configs.tokenValue || window.localStorage.getItem(configs.tokenKey)
+  }
+  // 如果令牌是新的则更新缓存
+  if (token !== configs.tokenValue) {
+    setToken(token)
+  }
+  return token
 }
 
 /**
@@ -425,7 +446,7 @@ export async function id (name, idVal, query = {}) {
 export async function getParam (codeOrObject) {
   const obj = _.isPlainObject(codeOrObject) ? codeOrObject : { Code: codeOrObject }
   if (_.isEmpty(obj)) {
-    console.error(`查询条件不能为空`)
+    console.error('查询条件不能为空')
     return {}
   }
   const json = await list('param', {
@@ -497,17 +518,6 @@ export function parseIcon (icon) {
 }
 
 /**
- * defaultMessages
- */
-const defaultMessages = _.result(window, 'g_app._store.getState.user.language') || _.result(window, _.get(config(), 'localeMessagesKey', 'localeMessages'), {})
-
-/**
- * LocaleContext
- * @type {React.Context<*>}
- */
-export const LocaleContext = React.createContext(defaultMessages)
-
-/**
  * L
  * @param key
  * @param defaultMessage
@@ -532,6 +542,7 @@ export function L (key, defaultMessage, formattedContext) {
  */
 export function withLocale (Component) {
   const displayName = `withLocale(${Component.displayName || Component.name})`
+  const LocaleContext = configs.localeContext
 
   class C extends React.Component {
     constructor (props) {

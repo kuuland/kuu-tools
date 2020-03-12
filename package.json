@@ -1,14 +1,14 @@
 {
   "name": "kuu-tools",
-  "version": "0.1.25",
+  "version": "0.2.0",
   "description": "Kuu front-end tools",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib",
     "build": "babel src --out-dir lib --source-maps --extensions .es6,.es,.jsx,.js --copy-files",
     "watch": "babel src --watch --out-dir lib --source-maps --extensions .es6,.es,.jsx,.js --copy-files",
-    "lint": "standard --verbose src/**/*.[js,jsx]",
-    "fix": "standard --fix src/**/*.[js,jsx]",
+    "lint": "standard --verbose",
+    "fix": "standard --fix",
     "pub": "BABEL_ENV=production npm run build",
     "prepub": "npm run clean"
   },
@@ -29,22 +29,22 @@
   },
   "homepage": "https://github.com/kuuland/kuu-tools#readme",
   "dependencies": {
-    "hoist-non-react-statics": "^3.3.1",
+    "hoist-non-react-statics": "^3.3.2",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.15",
     "qs": "^6.9.1",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.7",
-    "@babel/core": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "@babel/preset-react": "^7.7.4",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
+    "@babel/preset-react": "^7.8.3",
     "babel-plugin-import": "^1.13.0",
     "babel-preset-minify": "^0.5.1",
-    "husky": "^3.1.0",
-    "rimraf": "^3.0.0",
+    "husky": "^4.2.3",
+    "rimraf": "^3.0.2",
     "standard": "^14.3.1"
   },
   "husky": {
@@ -77,5 +77,10 @@
         ]
       }
     }
+  },
+  "standard": {
+    "ignore": [
+      "/lib/**/*"
+    ]
   }
 }
