@@ -342,6 +342,8 @@ export async function create (name, data) {
  * 默认删除接口
  * @param name
  * @param cond
+ * @param multi
+ * @param unsoft
  * @returns {Promise<{}>}
  */
 export async function remove (name, cond, multi = false, unsoft = false) {
@@ -353,8 +355,7 @@ export async function remove (name, cond, multi = false, unsoft = false) {
     return {}
   }
   try {
-    const json = await del(url, { cond, multi, unsoft })
-    return json
+    return await del(url, { cond, multi, unsoft })
   } catch (error) {
     console.error(error)
     return {}
@@ -366,6 +367,7 @@ export async function remove (name, cond, multi = false, unsoft = false) {
  * @param name
  * @param cond
  * @param doc
+ * @param multi
  * @returns {Promise<{}>}
  */
 export async function update (name, cond, doc, multi = false) {
@@ -418,7 +420,7 @@ export async function list (name, query = {}) {
 /**
  * 默认单个查询接口（基于列表接口）
  * @param name
- * @param cond
+ * @param query
  * @returns {Promise<*|{}>}
  */
 export async function one (name, query = {}) {
@@ -430,6 +432,7 @@ export async function one (name, query = {}) {
  * 默认ID查询接口（基于列表接口）
  * @param name
  * @param idVal
+ * @param query
  * @returns {Promise<*|{}>}
  */
 export async function id (name, idVal, query = {}) {
