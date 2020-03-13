@@ -551,7 +551,6 @@ export function L (key, defaultMessage, formattedContext) {
  */
 export function withLocale (Component) {
   const displayName = `withLocale(${Component.displayName || Component.name})`
-  const LocaleContext = configs.localeContext
 
   class C extends React.Component {
     constructor (props) {
@@ -573,6 +572,7 @@ export function withLocale (Component) {
     }
 
     render () {
+      const LocaleContext = configs.localeContext
       return (
         <LocaleContext.Consumer>
           {this.consumerChildren}
