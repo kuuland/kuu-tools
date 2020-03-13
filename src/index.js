@@ -192,8 +192,14 @@ export function config (opts) {
  * @param token 令牌
  */
 export function setToken (token) {
-  configs.tokenValue = token
-  window.localStorage.setItem(configs.tokenKey, token)
+  if (token && !['null', 'undefined'].includes(token)) {
+    configs.tokenValue = token
+    window.localStorage.setItem(configs.tokenKey, token)
+    return
+  }
+
+  configs.tokenValue = undefined
+  window.localStorage.removeItem(configs.tokenKey)
 }
 
 /**
