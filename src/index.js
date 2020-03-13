@@ -71,6 +71,7 @@ async function request (url, opts) {
       } else {
         if (json.code !== 0) {
           if (json.code === 555) {
+            clearToken()
             if (!url.includes('/logout')) {
               window.g_app._store.dispatch({
                 type: 'user/logout'
@@ -188,18 +189,25 @@ export function config (opts) {
 }
 
 /**
+ * 清空令牌
+ */
+export function clearToken () {
+  configs.tokenValue = undefined
+  window.localStorage.removeItem(configs.tokenKey)
+}
+
+/**
  * 设置令牌
  * @param token 令牌
  */
 export function setToken (token) {
-  if (token && !['null', 'undefined'].includes(token)) {
-    configs.tokenValue = token
-    window.localStorage.setItem(configs.tokenKey, token)
+  if (!token || ['null', 'undefined'].includes(token)) {
+    clearToken()
     return
   }
 
-  configs.tokenValue = undefined
-  window.localStorage.removeItem(configs.tokenKey)
+  configs.tokenValue = token
+  window.localStorage.setItem(configs.tokenKey, token)
 }
 
 /**
