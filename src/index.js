@@ -39,12 +39,7 @@ async function request (url, opts) {
     }
   }
   // 设置配置令牌
-  const token = getToken()
-  if (token) {
-    _.set(opts, 'headers.Authorization', token)
-    _.set(opts, 'headers.api_key', token)
-    _.set(opts, 'headers.Token', token)
-  }
+  setTokenInHeaders(opts)
   if (_.isFunction(_.get(configs, 'beforeFetch'))) {
     const args = { url, opts }
     const ret = _.get(configs, 'beforeFetch')(args)
@@ -111,17 +106,28 @@ function handleResponseMessage (json) {
   }
 }
 
+function setTokenInHeaders (opts) {
+  const token = getToken()
+  if (token) {
+    _.set(opts, 'headers.Authorization', token)
+    _.set(opts, 'headers.api_key', token)
+    _.set(opts, 'headers.Token', token)
+  }
+}
+
 /**
  * 文件下载
  * @param {string} url
  * @param {string} filename
- * @param {object} options
+ * @param {object} opts
  */
-export async function downloadFile (url, filename, options) {
+export async function downloadFile (url, filename, opts) {
+  // 设置配置令牌
+  setTokenInHeaders(opts)
   const res = await fetch(url, _.merge({
     cache: 'no-cache',
     credentials: 'include'
-  }, options))
+  }, opts))
   // 解析响应头filename
   if (!filename) {
     filename = res.headers.get('filename')
