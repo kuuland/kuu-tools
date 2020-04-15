@@ -11,7 +11,8 @@ const configs = {
   idKey: 'ID',
   messageHandler: undefined,
   localeContext: undefined,
-  localeMessages: undefined
+  localeMessages: undefined,
+  storage: window.sessionStorage
 }
 
 export function getLocaleContext () {
@@ -199,7 +200,7 @@ export function config (opts) {
  */
 export function clearToken () {
   configs.tokenValue = undefined
-  window.localStorage.removeItem(configs.tokenKey)
+  configs.storage.removeItem(configs.tokenKey)
 }
 
 /**
@@ -213,7 +214,7 @@ export function setToken (token) {
   }
 
   configs.tokenValue = token
-  window.localStorage.setItem(configs.tokenKey, token)
+  configs.storage.setItem(configs.tokenKey, token)
 }
 
 /**
@@ -225,7 +226,7 @@ export function getToken () {
   let token = query[configs.tokenKey]
   // url中没有再从缓存取
   if (!token) {
-    token = configs.tokenValue || window.localStorage.getItem(configs.tokenKey)
+    token = configs.tokenValue || configs.storage.getItem(configs.tokenKey)
   }
   // 如果令牌是新的则更新缓存
   if (token !== configs.tokenValue) {
