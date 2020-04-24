@@ -7,6 +7,7 @@ import hoistStatics from 'hoist-non-react-statics'
 const configs = {
   prefix: '/api',
   tokenKey: 'token',
+  setTokenInHeaders: false,
   tokenValue: undefined,
   idKey: 'ID',
   messageHandler: undefined,
@@ -109,9 +110,7 @@ function handleResponseMessage (json) {
 
 function setTokenInHeaders (opts) {
   const token = getToken()
-  if (token) {
-    _.set(opts, 'headers.Authorization', token)
-    _.set(opts, 'headers.api_key', token)
+  if (token && configs.setTokenInHeaders) {
     _.set(opts, 'headers.Token', token)
   }
 }
