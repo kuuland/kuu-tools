@@ -7,7 +7,7 @@ import hoistStatics from 'hoist-non-react-statics'
 const configs = {
   prefix: '/api',
   tokenKey: 'token',
-  setTokenInHeaders: false,
+  setTokenInHeaders: true,
   tokenValue: undefined,
   idKey: 'ID',
   messageHandler: undefined,
