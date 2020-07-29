@@ -13,7 +13,14 @@ const configs = {
   messageHandler: undefined,
   localeContext: undefined,
   localeMessages: undefined,
-  storage: window.sessionStorage
+  storage: window.sessionStorage,
+  onLogout: (url) => {
+    if (!url.includes('/logout')) {
+      window.g_app._store.dispatch({
+        type: 'user/logout'
+      })
+    }
+  }
 }
 
 export function getLocaleContext () {
@@ -69,10 +76,8 @@ async function request (url, opts) {
         if (json.code !== 0) {
           if (json.code === 555) {
             clearToken()
-            if (!url.includes('/logout')) {
-              window.g_app._store.dispatch({
-                type: 'user/logout'
-              })
+            if (_.isFunction(configs.onLogout)) {
+              configs.onLogout(url, json)
             }
           } else {
             handleResponseMessage(json)
