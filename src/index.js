@@ -15,10 +15,17 @@ const configs = {
   localeMessages: undefined,
   storage: window.sessionStorage,
   onLogout: (url) => {
-    if (!url.includes('/logout')) {
+    if (!url.includes('/logout') && window.g_app) {
       window.g_app._store.dispatch({
         type: 'user/logout'
       })
+    }
+  },
+  useIntl: function (prefix) {
+    return {
+      L: (id, defaultValue, ...values) => {
+        return defaultValue
+      }
     }
   }
 }
@@ -543,6 +550,10 @@ export function parseIcon (icon) {
   }
   ret.type = ret.type || 'fire'
   return ret
+}
+
+export function useIntl () {
+  return configs.useIntl
 }
 
 /**
