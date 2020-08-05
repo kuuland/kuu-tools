@@ -619,4 +619,18 @@ export function withLocale (Component) {
   })
 }
 
+export function convertLocaleCode (lang) {
+  if (lang) {
+    switch (lang) {
+      case 'zh-Hans':
+        return 'zh-CN'
+      case 'zh-Hant':
+        return 'zh-TW'
+      case 'en':
+        return 'en-US'
+    }
+  }
+  return lang
+}
+
 export default request
