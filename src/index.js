@@ -13,6 +13,7 @@ const configs = {
   messageHandler: undefined,
   localeContext: undefined,
   localeMessages: undefined,
+  localeMessageWrapper: message => message,
   storage: window.sessionStorage,
   onLogout: (url) => {
     if (!url.includes('/logout') && window.g_app) {
@@ -561,18 +562,25 @@ export function useIntl () {
  * @param key
  * @param defaultMessage
  * @param formattedContext
+ * @param noStyle
  * @returns {*|L.props}
  * @constructor
  */
-export function L (key, defaultMessage, formattedContext) {
+export function L (key, defaultMessage, formattedContext, noStyle = false) {
   const template = _.get(configs.localeMessages, key, defaultMessage) || key
+  let value
   if (formattedContext && !_.isEmpty(formattedContext)) {
     _.templateSettings.interpolate = /{{([\s\S]+?)}}/g
     const compiled = _.template(template)
-    const value = compiled(formattedContext)
+    value = compiled(formattedContext)
     return value
+  } else {
+    value = template
   }
-  return template
+  if (_.isFunction(configs.localeMessageWrapper) && !noStyle) {
+    value = configs.localeMessageWrapper(value)
+  }
+  return value
 }
 
 /**
