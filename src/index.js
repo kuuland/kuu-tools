@@ -87,6 +87,8 @@ async function request (url, opts) {
             if (_.isFunction(configs.onLogout)) {
               configs.onLogout(url, json)
             }
+          } else if (_.includes([404, 500, 403], json.code)) {
+            window.location.href = `/${json.code}`
           } else {
             handleResponseMessage(json)
           }
