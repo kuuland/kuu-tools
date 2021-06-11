@@ -7,6 +7,7 @@ import hoistStatics from 'hoist-non-react-statics'
 const configs = {
   prefix: '/api',
   tokenKey: 'token',
+  headers: {},
   setTokenInHeaders: true,
   tokenValue: undefined,
   idKey: 'ID',
@@ -54,6 +55,9 @@ async function request (url, opts) {
       cache: 'no-cache',
       credentials: 'include'
     }
+  }
+  if (!_.isEmpty(configs.headers)) {
+    _.merge(opts.headers, configs.headers)
   }
   // 设置配置令牌
   setTokenInHeaders(opts)
