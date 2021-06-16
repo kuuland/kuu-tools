@@ -334,7 +334,9 @@ export function withPrefix (url) {
     return url
   }
   if (prefix) {
-    prefix = prefix.startsWith('/') ? prefix : `/${prefix}`
+    if (!prefix.startsWith('http')) {
+      prefix = prefix.startsWith('/') ? prefix : `/${prefix}`
+    }
     prefix = prefix.endsWith('/') ? prefix.substring(0, prefix.length - 1) : prefix
   }
   url = `${prefix}${url}`
