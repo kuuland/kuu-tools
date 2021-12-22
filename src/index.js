@@ -6,7 +6,9 @@ import hoistStatics from 'hoist-non-react-statics'
 
 const configs = {
   prefix: '/api',
-  tokenKey: 'token',
+  tokenStorageKey: 'TOKEN',
+  tokenQueryKey: 'token',
+  tokenHeaderKey: 'Token',
   headers: {},
   setTokenInHeaders: true,
   tokenValue: undefined,
@@ -130,7 +132,7 @@ function handleResponseMessage (json) {
 function setTokenInHeaders (opts) {
   const token = getToken()
   if (token && configs.setTokenInHeaders) {
-    _.set(opts, 'headers.Token', token)
+    _.set(opts, `headers.${configs.tokenHeaderKey}`, token)
   }
 }
 
@@ -218,7 +220,7 @@ export function config (opts) {
  */
 export function clearToken () {
   configs.tokenValue = undefined
-  configs.storage.removeItem(configs.tokenKey)
+  configs.storage.removeItem(configs.tokenStorageKey)
 }
 
 /**
@@ -232,7 +234,7 @@ export function setToken (token) {
   }
 
   configs.tokenValue = token
-  configs.storage.setItem(configs.tokenKey, token)
+  configs.storage.setItem(configs.tokenStorageKey, token)
 }
 
 /**
@@ -241,10 +243,10 @@ export function setToken (token) {
 export function getToken () {
   // 优先取url中的令牌
   const query = qs.parse(window.location.search.substr(1))
-  let token = query[configs.tokenKey]
+  let token = query[configs.tokenQueryKey]
   // url中没有再从缓存取
   if (!token) {
-    token = configs.tokenValue || configs.storage.getItem(configs.tokenKey)
+    token = configs.tokenValue || configs.storage.getItem(configs.tokenStorageKey)
   }
   // 如果令牌是新的则更新缓存
   if (token !== configs.tokenValue) {
