@@ -9,6 +9,7 @@ const configs = {
   tokenStorageKey: 'TOKEN',
   tokenQueryKey: 'token',
   tokenHeaderKey: 'Token',
+  tokenValuePrefix: undefined,
   headers: {},
   setTokenInHeaders: true,
   tokenValue: undefined,
@@ -83,7 +84,7 @@ async function request (url, opts) {
     try {
       await configs.afterFetch(res)
     } catch (e) {
-      console.error(e)
+      console.error('Request failed:', e)
       return
     }
   }
@@ -140,8 +141,11 @@ function handleResponseMessage (json) {
 }
 
 function setTokenInHeaders (opts) {
-  const token = getToken()
+  let token = getToken()
   if (token && configs.setTokenInHeaders) {
+    if (configs.tokenValuePrefix) {
+      token = configs.tokenValuePrefix + token
+    }
     _.set(opts, `headers.${configs.tokenHeaderKey}`, token)
   }
 }
