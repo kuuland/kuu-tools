@@ -18,6 +18,8 @@ const configs = {
   localeMessages: undefined,
   localeMessageWrapper: message => message,
   storage: window.sessionStorage,
+  beforeFetch: undefined,
+  afterFetch: undefined,
   onLogout: (url) => {
     if (!url.includes('/logout') && window.g_app) {
       window.g_app._store.dispatch({
@@ -77,6 +79,14 @@ async function request (url, opts) {
 
   // 执行请求
   const res = await fetch(url, opts)
+  if (_.isFunction(configs.afterFetch)) {
+    try {
+      await configs.afterFetch(res)
+    } catch (e) {
+      console.error(e)
+      return
+    }
+  }
   let data = null
   let success = false
   if (res.status >= 200 && res.status < 300) {
