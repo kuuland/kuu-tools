@@ -57,8 +57,7 @@ async function request (url, opts) {
       headers: {
         'Content-Type': 'application/json'
       },
-      cache: 'no-cache',
-      credentials: 'include'
+      cache: 'no-cache'
     }
   }
   if (!_.isEmpty(configs.headers)) {
@@ -160,8 +159,7 @@ export async function downloadFile (url, filename, opts) {
   // 设置配置令牌
   setTokenInHeaders(opts)
   const res = await fetch(url, _.merge({
-    cache: 'no-cache',
-    credentials: 'include'
+    cache: 'no-cache'
   }, opts))
   // 解析响应头filename
   if (!filename) {
@@ -293,8 +291,7 @@ export function post (url, body, opts) {
     headers: {
       'Content-Type': 'application/json'
     },
-    cache: 'no-cache',
-    credentials: 'include'
+    cache: 'no-cache'
   }, opts))
 }
 
@@ -312,8 +309,7 @@ export function put (url, body, opts) {
     headers: {
       'Content-Type': 'application/json'
     },
-    cache: 'no-cache',
-    credentials: 'include'
+    cache: 'no-cache'
   }, opts))
 }
 
@@ -331,8 +327,7 @@ export function del (url, body, opts) {
     headers: {
       'Content-Type': 'application/json'
     },
-    cache: 'no-cache',
-    credentials: 'include'
+    cache: 'no-cache'
   }, opts))
 }
 
