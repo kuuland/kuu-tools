@@ -139,7 +139,7 @@ function handleResponseMessage (json) {
   }
 }
 
-function setTokenInHeaders (opts) {
+function setTokenInHeaders (opts = {}) {
   let token = getToken()
   if (token && configs.setTokenInHeaders) {
     if (configs.tokenValuePrefix) {
@@ -155,7 +155,7 @@ function setTokenInHeaders (opts) {
  * @param {string} filename
  * @param {object} opts
  */
-export async function downloadFile (url, filename, opts) {
+export async function downloadFile (url, filename, opts = {}) {
   // 设置配置令牌
   setTokenInHeaders(opts)
   const res = await fetch(url, _.merge({
